@@ -237,4 +237,31 @@
             android:textColor="#777777"
             android:textSize="14sp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutError"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="450dp"
+            android:layout_height="450dp"
+            android:src="@drawable/error_image" />
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="네트워크 연결을 확인해주세요."
+        android:layout_marginTop="16dp" />
+
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="다시 시도"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

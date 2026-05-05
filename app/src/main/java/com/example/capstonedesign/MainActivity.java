@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.example.capstonedesign.databinding.ActivityMainBinding;
 import com.google.android.material.chip.Chip;
-
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import java.util.List;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,78 +45,95 @@ public class MainActivity extends AppCompatActivity {
         binding.noticeListView.setAdapter(noticeAdapter);
 
         binding.btnSearch.setOnClickListener(v -> {
-            Toast.makeText(MainActivity.this, "검색 테스트", Toast.LENGTH_SHORT).show();
             showLoadingState();
 
-            v.postDelayed(new Runnable(){
-                public void run(){
-                    if(nList.isEmpty()){
-                        showEmptyState();
+            RetrofitClient.getService().getAllNotices().enqueue(new retrofit2.Callback<java.util.List<Notice>>() {
+                @Override
+                public void onResponse(retrofit2.Call<java.util.List<Notice>> call, retrofit2.Response<java.util.List<Notice>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        nList.clear();
+                        nList.addAll(response.body());
+
+                        if (nList.isEmpty()) {
+                            showEmptyState();
+                        } else {
+                            noticeAdapter.notifyDataSetChanged();
+                            showSuccessState();
+                        }
+                        Toast.makeText(MainActivity.this, "서버 연결 성공!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        showErrorState();
+                        Toast.makeText(MainActivity.this, "응답 실패 (코드: " + response.code() + ")", Toast.LENGTH_SHORT).show();
                     }
-                    else{
-                        showSuccessState();
-                    }
-                    Toast.makeText(MainActivity.this, "검색 완료", Toast.LENGTH_SHORT).show();
                 }
-            },8000);
+
+                @Override
+                public void onFailure(retrofit2.Call<java.util.List<Notice>> call, Throwable t) {
+                    showErrorState();
+                    Toast.makeText(MainActivity.this, "연결 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-        // 1. XML에 있는 View들 찾아오기
-        EditText searchBar = findViewById(R.id.search_bar);
-        LinearLayout layoutSuggestions = findViewById(R.id.layout_suggestions);
+        binding.layoutSuggestions.setVisibility(View.GONE);
 
-        Chip chipSchedule = findViewById(R.id.chip_schedule);
-        Chip chipScholarship = findViewById(R.id.chip_scholarship);
-        Chip chipDormitory = findViewById(R.id.chip_dormitory);
-        Chip chipEnrollment = findViewById(R.id.chip_enrollment);
-
-// 2. 초기 상태: 추천 영역 숨기기
-        layoutSuggestions.setVisibility(View.GONE);
-
-        // 3. 검색창에 포커스가 갈 때 추천 영역 띄우기
-        searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        binding.searchBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    layoutSuggestions.setVisibility(View.VISIBLE);
+                    binding.layoutSuggestions.setVisibility(View.VISIBLE);
                 } else {
-                    // 다른 곳을 터치해서 포커스를 잃으면 다시 숨기기
-                    layoutSuggestions.setVisibility(View.GONE);
+                    binding.layoutSuggestions.setVisibility(View.GONE);
                 }
             }
         });
 
-// 터치 이벤트도 추가 (포커스가 이미 있는 상태에서 눌렀을 때를 대비)
-        searchBar.setOnClickListener(new View.OnClickListener() {
+        binding.searchBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layoutSuggestions.setVisibility(View.VISIBLE);
+                binding.layoutSuggestions.setVisibility(View.VISIBLE);
             }
         });
 
-        // 4. '장학금' 칩 클릭 이벤트
-        chipScholarship.setOnClickListener(new View.OnClickListener() {
+        binding.chipScholarship.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchBar.setText("장학금");
-                searchBar.setSelection(searchBar.getText().length()); // 커서를 글자 맨 뒤로 이동
-                layoutSuggestions.setVisibility(View.GONE); // 칩 영역 숨기기
-                searchBar.clearFocus(); // 키보드 내릴 준비 (선택사항)
+                binding.searchBar.setText("장학금");
+                binding.searchBar.setSelection(binding.searchBar.getText().length());
+                binding.layoutSuggestions.setVisibility(View.GONE);
+                binding.searchBar.clearFocus();
             }
         });
 
-// '학사일정' 칩 클릭 이벤트
-        chipSchedule.setOnClickListener(new View.OnClickListener() {
+        binding.chipSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchBar.setText("학사일정");
-                searchBar.setSelection(searchBar.getText().length());
-                layoutSuggestions.setVisibility(View.GONE);
-                searchBar.clearFocus();
+                binding.searchBar.setText("학사일정");
+                binding.searchBar.setSelection(binding.searchBar.getText().length());
+                binding.layoutSuggestions.setVisibility(View.GONE);
+                binding.searchBar.clearFocus();
             }
         });
 
-// 나머지 칩(기숙사, 수강신청)도 동일한 방식으로 복사해서 글자만 바꿔서 넣어주세요!
+        binding.chipDormitory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.searchBar.setText("기숙사");
+                binding.searchBar.setSelection(binding.searchBar.getText().length());
+                binding.layoutSuggestions.setVisibility(View.GONE);
+                binding.searchBar.clearFocus();
+            }
+        });
+
+        binding.chipEnrollment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.searchBar.setText("수강신청");
+                binding.searchBar.setSelection(binding.searchBar.getText().length());
+                binding.layoutSuggestions.setVisibility(View.GONE);
+                binding.searchBar.clearFocus();
+            }
+        });
     }
     private void showLoadingState() {
         binding.noticeListView.setVisibility(View.GONE);
@@ -132,13 +152,24 @@ public class MainActivity extends AppCompatActivity {
         binding.ivLoading.setVisibility(View.GONE);
         binding.noticeListView.setVisibility(View.VISIBLE);
         binding.aiSummary.setVisibility(View.VISIBLE);
+        binding.userQueryBox.setVisibility(View.VISIBLE);
+        binding.layoutError.setVisibility(View.GONE);
     }
 
     private void showEmptyState() {
         binding.ivLoading.setVisibility(View.GONE);
         binding.noticeListView.setVisibility(View.GONE);
         binding.aiSummary.setVisibility(View.GONE);
-
         binding.layoutEmpty.setVisibility(View.VISIBLE);
+        binding.layoutError.setVisibility(View.GONE);
+    }
+
+    private void showErrorState() {
+        binding.ivLoading.setVisibility(View.GONE);
+        binding.noticeListView.setVisibility(View.GONE);
+        binding.aiSummary.setVisibility(View.GONE);
+        binding.layoutEmpty.setVisibility(View.GONE);
+        binding.layoutError.setVisibility(View.VISIBLE);
+        binding.userQueryBox.setVisibility(View.GONE);
     }
 }

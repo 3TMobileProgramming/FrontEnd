@@ -5,6 +5,7 @@ public class Notice {
     private String title;
     private String date;
     private String noticeUrl;
+    public Notice() { }
     public Notice(String category, String title, String date, String noticeUrl){
         this.category = category;
         this.title = title;
