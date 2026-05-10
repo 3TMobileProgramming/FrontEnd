@@ -1,20 +1,20 @@
 package com.example.capstonedesign;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.capstonedesign.databinding.ActivityMainBinding;
-import com.google.android.material.chip.Chip;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import java.util.List;
+import com.example.capstonedesign.models.Notice;
+import com.example.capstonedesign.models.SummaryResponse;
+
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -45,34 +45,32 @@ public class MainActivity extends AppCompatActivity {
         binding.noticeListView.setAdapter(noticeAdapter);
 
         binding.btnSearch.setOnClickListener(v -> {
+            String query = binding.searchBar.getText().toString().trim();
+            if (query.isEmpty()) return;
+
+            binding.userQueryBox.setText(query);
             showLoadingState();
 
-            RetrofitClient.getService().getAllNotices().enqueue(new retrofit2.Callback<java.util.List<Notice>>() {
+            RetrofitClient.getService().getSearchNotices(query).enqueue(new retrofit2.Callback<List<Notice>>() {
                 @Override
-                public void onResponse(retrofit2.Call<java.util.List<Notice>> call, retrofit2.Response<java.util.List<Notice>> response) {
+                public void onResponse(Call<List<Notice>> call, Response<List<Notice>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         nList.clear();
                         nList.addAll(response.body());
-
-                        if (nList.isEmpty()) {
-                            showEmptyState();
-                        } else {
-                            noticeAdapter.notifyDataSetChanged();
-                            showSuccessState();
-                        }
-                        Toast.makeText(MainActivity.this, "서버 연결 성공!", Toast.LENGTH_SHORT).show();
+                        noticeAdapter.notifyDataSetChanged();
+                        showSuccessState();
                     } else {
-                        showErrorState();
-                        Toast.makeText(MainActivity.this, "응답 실패 (코드: " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                        showEmptyState();
                     }
                 }
-
                 @Override
-                public void onFailure(retrofit2.Call<java.util.List<Notice>> call, Throwable t) {
+                public void onFailure(Call<List<Notice>> call, Throwable t) {
                     showErrorState();
-                    Toast.makeText(MainActivity.this, "연결 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+
+            binding.layoutSuggestions.setVisibility(View.GONE);
+            binding.searchBar.clearFocus();
         });
 
         binding.layoutSuggestions.setVisibility(View.GONE);
@@ -134,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.searchBar.clearFocus();
             }
         });
+        fetchMockAiSummary();
     }
     private void showLoadingState() {
         binding.noticeListView.setVisibility(View.GONE);
@@ -171,5 +170,21 @@ public class MainActivity extends AppCompatActivity {
         binding.layoutEmpty.setVisibility(View.GONE);
         binding.layoutError.setVisibility(View.VISIBLE);
         binding.userQueryBox.setVisibility(View.GONE);
+    }
+
+    private void updateAiSummaryUI(SummaryResponse data) {
+        if (data != null) {
+            binding.aiSummary.setText(data.getContent());
+        }
+    }
+
+    private void fetchMockAiSummary() {
+        SummaryResponse mockData = new SummaryResponse();
+        mockData.setContent("이번 주 핵심 공지: 캡스톤 디자인 기획안 제출 기한이 이번 주 일요일까지로 연장되었습니다. 서류 양식을 확인하세요!");
+
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            updateAiSummaryUI(mockData);
+            android.widget.Toast.makeText(MainActivity.this, "AI 요약 연동 완료!", android.widget.Toast.LENGTH_SHORT).show();
+        }, 2000);
     }
 }

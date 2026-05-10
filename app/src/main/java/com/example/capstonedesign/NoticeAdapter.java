@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import com.example.capstonedesign.databinding.ItemNoticeBinding;
+import com.example.capstonedesign.models.Notice;
 
 public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeViewHolder>{
     private ArrayList<Notice> nList = new ArrayList<>();
@@ -36,6 +37,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
     public static class NoticeViewHolder extends RecyclerView.ViewHolder {
 
         private final ItemNoticeBinding binding;
+        private ArrayList<Notice> nList;
 
         public NoticeViewHolder(ItemNoticeBinding binding) {
             super(binding.getRoot());
@@ -56,5 +58,9 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
                 v.getContext().startActivity(intent);
             });
         }
+    }
+    public void filterList(ArrayList<Notice> filteredList) {
+        this.nList = filteredList;
+        notifyDataSetChanged();
     }
 }
