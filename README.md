@@ -38,6 +38,8 @@ src/main/res/
 │   └── item_notice.xml          # 공지사항 리스트 단일 항목 레이아웃
 └── drawable/
     └── loading.gif              # 통신 대기 상태 로딩 애니메이션
+    └── empty_image.png          # 결과 없음 상태 이미지
+    └── error_image.png          # 에러 발생 상태 이미지
 
 ```
 
