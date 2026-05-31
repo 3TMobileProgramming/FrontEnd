@@ -1,4 +1,4 @@
-# 🏫 삼육대학교 공지사항 AI 앱 - Frontend (Android)
+# 🏫 삼육대학교 공지사항 AI 앱 - Frontend
 
 ## 프로젝트 소개
 
