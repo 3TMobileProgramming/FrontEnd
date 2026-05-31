@@ -17,7 +17,7 @@
 | **Framework** | Android (Native) |
 | **Language** | Java |
 | **Network** | Retrofit2, Gson |
-| **UI/UX** | ViewBinding, Glide (GIF 제어), Markwon (Markdown 렌더링) |
+| **UI/UX** | Material Design, ConstraintLayout, Markwon |
 
 ## 프로그램 구조
 
