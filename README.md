@@ -8,7 +8,7 @@
 
 | 이름 | 담당 |
 | --- | --- |
-| **이정우** | 안드로이드 UI/UX 설계, Retrofit API 연동, AI 요약 렌더링 처리, 상태별 화면(Loading/Error) 제어 |
+| **이정우** | 안드로이드 UI/UX 설계, Retrofit API 연동, AI 요약 렌더링 처리, 상태별 화면(Loading/Error/Empty) 제어 |
 
 ## 기술 스택
 
